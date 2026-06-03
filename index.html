@@ -425,7 +425,7 @@
 
 <!-- 1. TELA DE LOGIN -->
 <div id="screen-login" class="card"> <!-- Adicionado a classe card aqui -->
-    <h3>Passagem de Carga | Conferência v2</h3>
+    <h3>Passagem de Carga | Conferência v3</h3>
     <label>E-mail</label>
     <input type="email" id="login-user" placeholder="seu@email.com">
     
@@ -3426,28 +3426,61 @@ window.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('modalUfConf');
   const select = document.getElementById('selecaoUfConf');
   const btn = document.getElementById('btnConfirmarUfConf');
+  const comboTransp = document.getElementById('login-transp'); // 🎯 Captura o combo da sua tela de login
 
   // Força o modal a iniciar visível bloqueando interações ao fundo
   if (modal) modal.style.display = 'flex';
 
-  if (btn && select && modal) {
+  if (btn && select && modal && comboTransp) {
     btn.addEventListener('click', function() {
       if (select.value === "") {
         alert("Por favor, selecione uma UF válida para continuar.");
         return;
       }
       
-      // Salva a seleção na nova variável global do conferente
+      // 1. Salva a seleção na nova variável global do conferente
       UF_SELECIONADA_CONF = select.value;
       
-      // Oculta o modal liberando a tela de login original por baixo
+      // 2. Oculta o modal liberando a tela de login original por baixo
       modal.style.display = 'none';
       console.log("Região de conferência em doca definida:", UF_SELECIONADA_CONF);
       
-      // 🚀 PRÓXIMO PASSO LOGICO: Aqui dispararemos o carregamento dinâmico do combo de transportadoras de login filtrado
+      // 3. Coloca o combo em estado de carregamento assíncrono
+      comboTransp.innerHTML = '<option value="" disabled selected>Carregando transportadoras de ' + UF_SELECIONADA_CONF + '...</option>';
+      
+      // 4. Cria o Callback Global que receberá a resposta da rota paralela do Apps Script
+      window.cbCarregarTranspConf = function(listaTransp) {
+        // Reseta o cabeçalho padrão da caixa de seleção
+        comboTransp.innerHTML = '<option value="" disabled selected>Selecione a Transportadora...</option>';
+        
+        if (!listaTransp || listaTransp.length === 0) {
+          comboTransp.innerHTML = '<option value="" disabled>Nenhuma transportadora ativa para esta UF</option>';
+          return;
+        }
+        
+        // Injeta cirurgicamente cada transportadora filtrada que veio do servidor
+        listaTransp.forEach(function(transp) {
+          const option = document.createElement('option');
+          option.value = transp;
+          option.textContent = transp;
+          comboTransp.appendChild(option);
+        });
+        
+        // Remove o ouvinte da memória global por segurança
+        delete window.cbCarregarTranspConf;
+      };
+      
+      // 5. Dispara a chamada de rede utilizando o mecanismo nativo do seu projeto (GET/JSONP)
+      // Mapeia usando a constante 'urlSheets' padrão do seu Front-CONF
+      if (typeof fetchJSONP === "function") {
+        fetchJSONP(urlSheets + '?action=getTransportadorasList&uf=' + UF_SELECIONADA_CONF + '&callback=cbCarregarTranspConf');
+      } else if (typeof callServer === "function") {
+        callServer('getTransportadorasList', { uf: UF_SELECIONADA_CONF }, 'cbCarregarTranspConf');
+      }
     });
   }
 });
+
 
 
 
