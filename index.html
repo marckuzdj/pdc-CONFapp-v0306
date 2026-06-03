@@ -364,11 +364,13 @@
     </div>
 </div>
 
-<!-- HTML DO MODAL DE ESTADO (Inserir logo após a abertura da tag <body>) -->
+<!-- ========================================== -->
+<!-- NOVO: MODAL INTERCEPTADOR DE REGIÃO (UF)   -->
+<!-- ========================================== -->
 <div id="modalUfConf" class="modal-overlay" style="display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: rgba(0, 0, 0, 0.65);">
   <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
     
-    <!-- Identidade Visual do Painel de Conferência -->
+    <!-- Identidade Visual Baseada no Layout Roxo da Doca -->
     <div style="margin-bottom: 20px;">
       <div style="width: 70px; height: 70px; background: #8A05BE; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center;">
         <svg viewBox="0 0 24 24" width="36" height="36" fill="white">
@@ -379,10 +381,10 @@
       <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Selecione o estado de operação em doca</p>
     </div>
 
-    <!-- Campo de Seleção Clean -->
+    <!-- Seletor de Estados Clínico -->
     <div style="text-align: left; margin-bottom: 25px;">
       <label style="color: #8A05BE; font-weight: bold; font-size: 13px; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Estado (UF):</label>
-      <select id="selecaoUfConf" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: white; cursor: pointer; outline: none;">
+      <select id="selecaoUfConf" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: white; cursor: pointer; outline: none; box-sizing: border-box;">
         <option value="" disabled selected>Selecione a Região</option>
         <option value="AC">Acre (AC)</option>
         <option value="AL">Alagoas (AL)</option>
@@ -414,13 +416,14 @@
       </select>
     </div>
 
-    <!-- Botão de Confirmação Roxo Estilo Padrão -->
+    <!-- Botão de Confirmação Roxo Rígido -->
     <button id="btnConfirmarUfConf" style="width: 100%; padding: 14px; background: #8A05BE; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#7004A2'" onmouseout="this.style.background='#8A05BE'">
       Confirmar Região
     </button>
 
   </div>
 </div>
+
 
   <!-- ========================================== -->
 <!-- NOVO: MODAL DE VALIDAÇÃO DE ID DE CADASTRO -->
@@ -453,7 +456,7 @@
 
 <!-- 1. TELA DE LOGIN -->
 <div id="screen-login" class="card"> <!-- Adicionado a classe card aqui -->
-    <h3>Passagem de Carga | Conferência v6</h3>
+    <h3>Passagem de Carga | Conferência v1</h3>
     <label>E-mail</label>
     <input type="email" id="login-user" placeholder="seu@email.com">
     
@@ -663,7 +666,7 @@ const SCRIPTS_POR_UF = {
 // Variável de controle mestre (Substitui a constante urlSheets fixa antiga)
 let urlSheets = ""; 
 let UF_SELECIONADA_CONF = ""; // Guarda o estado escolhido globalmente no Front-CONF
-    
+ 
 let codigosLidos = [];
 let dadosCompletos = [];
 let enviandoDados = false;
@@ -968,6 +971,7 @@ window.onload = carregarDadosIniciais;
 
 // --- 4. ROTINA DE LOGIN E CADASTRO ---
 // --- FUNÇÃO DE LOGIN COM SPINNER, VALIDAÇÃO DE TRANSPORTADORA E CASE-INSENSITIVE TOTAL ---
+// --- FUNÇÃO DE LOGIN COM SPINNER, VALIDAÇÃO DE TRANSPORTADORA E CASE-INSENSITIVE TOTAL ---
 async function realizarLogin() {
     // 1. Trava global para evitar duplo clique (Mantido)
     if (typeof enviandoDados !== 'undefined' && enviandoDados) return;
@@ -992,7 +996,7 @@ async function realizarLogin() {
     const textoOriginal = btnLogin.innerHTML;
     btnLogin.innerHTML = '<div class="spinner"></div> Autenticando...';
 
-    // 5. URL com parâmetros padronizados (🎯 INJEÇÃO CIRÚRGICA: Adicionado '&uf=' repassando a variável global)
+    // 5. URL com parâmetros padronizados (🎯 INJEÇÃO CIRÚRGICA: Adicionado '&uf=' repassando a variável global do modal)
     const url = `${urlSheets}?action=validarLogin&email=${encodeURIComponent(inputEmail)}&senha=${encodeURIComponent(inputPass)}&transp=${encodeURIComponent(inputTransp)}&uf=${encodeURIComponent(UF_SELECIONADA_CONF)}`;
 
     try {
@@ -1041,6 +1045,7 @@ async function realizarLogin() {
         if (typeof enviandoDados !== 'undefined') enviandoDados = false;
     }
 }
+
 
 
 
