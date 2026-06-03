@@ -1102,7 +1102,7 @@ async function cadastrar() {
 
     if (modalId && lblTexto && inputCodigo && btnConfirmar && btnCancelar) {
         // Injeta a descrição contextualizada com o nome selecionado da transportadora e a UF ativa
-        lblTexto.textContent = 'Digite o ID de Cadastro para o Operador "' + transp + '" (' + UF_SELECIONADA_CONF + '):';
+        lblTexto.textContent = 'Digite a Chave de Cadastro para o Transportador "' + transp + '" (' + UF_SELECIONADA_CONF + '):';
         inputCodigo.value = '';
         modalId.style.display = 'flex';
 
