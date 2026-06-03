@@ -453,7 +453,7 @@
 
 <!-- 1. TELA DE LOGIN -->
 <div id="screen-login" class="card"> <!-- Adicionado a classe card aqui -->
-    <h3>Passagem de Carga | Conferência v5</h3>
+    <h3>Passagem de Carga | Conferência v6</h3>
     <label>E-mail</label>
     <input type="email" id="login-user" placeholder="seu@email.com">
     
@@ -978,8 +978,8 @@ async function realizarLogin() {
     const textoOriginal = btnLogin.innerHTML;
     btnLogin.innerHTML = '<div class="spinner"></div> Autenticando...';
 
-    // 5. URL com parâmetros padronizados (Todos em minúsculas)
-    const url = `${urlSheets}?action=validarLogin&email=${encodeURIComponent(inputEmail)}&senha=${encodeURIComponent(inputPass)}&transp=${encodeURIComponent(inputTransp)}`;
+    // 5. URL com parâmetros padronizados (🎯 INJEÇÃO CIRÚRGICA: Adicionado '&uf=' repassando a variável global)
+    const url = `${urlSheets}?action=validarLogin&email=${encodeURIComponent(inputEmail)}&senha=${encodeURIComponent(inputPass)}&transp=${encodeURIComponent(inputTransp)}&uf=${encodeURIComponent(UF_SELECIONADA_CONF)}`;
 
     try {
         const res = await fetch(url);
@@ -1027,6 +1027,7 @@ async function realizarLogin() {
         if (typeof enviandoDados !== 'undefined') enviandoDados = false;
     }
 }
+
 
 
 
