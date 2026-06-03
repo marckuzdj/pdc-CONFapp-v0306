@@ -453,7 +453,7 @@
 
 <!-- 1. TELA DE LOGIN -->
 <div id="screen-login" class="card"> <!-- Adicionado a classe card aqui -->
-    <h3>Passagem de Carga | Conferência v6</h3>
+    <h3>Passagem de Carga | Conferência v1</h3>
     <label>E-mail</label>
     <input type="email" id="login-user" placeholder="seu@email.com">
     
@@ -649,7 +649,41 @@
       // --- LÓGICA DE NAVEGAÇÃO E CADASTRO ---
 
 // --- 1. CONFIGURAÇÕES E VARIÁVEIS GLOBAIS ---
-const urlSheets = "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec"; // Substituir pela sua URL real
+//const urlSheets = "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec"; // Substituir pela sua URL real
+// 🎯 DICIONÁRIO MESTRE: Cada estado aponta para o seu próprio Web App isolado
+const SCRIPTS_POR_UF = {
+  "AC": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "AL": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "AP": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "AM": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "BA": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "CE": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "DF": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "ES": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "GO": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "MA": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "MT": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "MS": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "MG": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "PA": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "PB": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "PR": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "PE": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "PI": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "RJ": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "RN": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "RS": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "RO": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "RR": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "SC": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "SP": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "SE": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
+  "TO": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec"  
+    // Adicione as demais UFs conforme criar os seus Deploys...
+};
+
+// Deixe a variável de comunicação do seu projeto como Let (vazia inicialmente)
+let urlSheets = ""; 
 let codigosLidos = [];
 let dadosCompletos = [];
 let enviandoDados = false;
@@ -3486,16 +3520,28 @@ window.addEventListener('DOMContentLoaded', function() {
 
   if (modal) modal.style.display = 'flex';
 
-  if (btn && select && modal && comboLogin) {
     btn.addEventListener('click', function() {
       if (select.value === "") {
         alert("Por favor, selecione uma UF válida para continuar.");
         return;
       }
       
+      // 1. Salva a seleção na variável global do conferente
       UF_SELECIONADA_CONF = select.value;
-      modal.style.display = 'none';
       
+      // 🎯 MUDANÇA CIRÚRGICA: Altera dinamicamente a URL de rede para o script da UF escolhida
+      urlSheets = SCRIPTS_POR_UF[UF_SELECIONADA_CONF];
+      
+      if (!urlSheets) {
+        alert("⚠️ Erro: Link do servidor não configurado para a região: " + UF_SELECIONADA_CONF);
+        return;
+      }
+
+      // Oculta o modal liberando a tela de login original por baixo
+      modal.style.display = 'none';
+      console.log("Rota de comunicação apontada para o servidor de:", UF_SELECIONADA_CONF, "->", urlSheets);
+      
+      // ... resto do seu código que limpa e preenche o combo segue exatamente igual
       // Coloca AMBOS os comboboxes em estado de carregamento síncrono
       comboLogin.innerHTML = '<option value="" disabled selected>Carregando transportadoras de ' + UF_SELECIONADA_CONF + '...</option>';
       if (comboCadastro) {
