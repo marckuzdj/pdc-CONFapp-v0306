@@ -422,10 +422,38 @@
   </div>
 </div>
 
+  <!-- ========================================== -->
+<!-- NOVO: MODAL DE VALIDAÇÃO DE ID DE CADASTRO -->
+<!-- ========================================== -->
+<div id="modalIdCadConf" class="modal-overlay" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: rgba(0, 0, 0, 0.65);">
+  <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    
+    <div style="margin-bottom: 20px;">
+      <div style="width: 60px; height: 60px; background: #8A05BE; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="white">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+      </div>
+      <h3 style="color: #8A05BE; margin: 0; font-size: 18px;">Segurança da Transportadora</h3>
+    </div>
+
+    <div style="text-align: left; margin-bottom: 25px;">
+      <label id="lblTextoIdCadConf" style="color: #666; font-size: 14px; display: block; margin-bottom: 8px; font-weight: bold;"></label>
+      <input type="text" id="inputCodigoIdCadConf" placeholder="Ex: FESP004" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; text-transform: uppercase;">
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <button id="btnCancelarIdCadConf" style="width: 50%; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
+      <button id="btnConfirmarIdCadConf" style="width: 50%; padding: 12px; background: #8A05BE; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Validar Chave</button>
+    </div>
+
+  </div>
+</div>
+  
 
 <!-- 1. TELA DE LOGIN -->
 <div id="screen-login" class="card"> <!-- Adicionado a classe card aqui -->
-    <h3>Passagem de Carga | Conferência v3</h3>
+    <h3>Passagem de Carga | Conferência v5</h3>
     <label>E-mail</label>
     <input type="email" id="login-user" placeholder="seu@email.com">
     
@@ -466,8 +494,10 @@
     <label>Nome Completo</label>
     <input type="text" id="reg-nome" placeholder="Digite seu nome completo">
     
+    <!--
     <label>Token</label>
     <input type="text" id="reg-doc" placeholder="Insira o Token">
+    -->
     
     <label>E-mail</label>
     <input type="email" id="reg-email" placeholder="seu@email.com">
@@ -1053,53 +1083,76 @@ async function cadastrar() {
 
     const btn = document.getElementById('btn-cadastrar');
     const nome = document.getElementById('reg-nome').value.trim();
-    const doc = document.getElementById('reg-doc').value.trim();
     const email = document.getElementById('reg-email').value.trim().toLowerCase();
     const transp = document.getElementById('reg-transp-list').value;
     const senha = document.getElementById('reg-pass').value.trim().toLowerCase();
     const senha2 = document.getElementById('reg-pass2').value.trim().toLowerCase();
 
     // 1. Validações básicas no Frontend
-    if (!nome || !doc || !email || !transp || !senha) return alert("⚠️ Preencha todos os campos!");
+    if (!nome || !email || !transp || !senha) return alert("⚠️ Preencha todos os campos!");
     if (senha !== senha2) return alert("❌ As senhas não conferem!");
 
-    // Ativa visual de processamento
-    processandoCadastro = true;
-    btn.disabled = true;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<div class="spinner"></div> Gravando Registro...';
+    // Captura os elementos do modal ID_CAD para a interceptação em tela
+    const modalId = document.getElementById('modalIdCadConf');
+    const lblTexto = document.getElementById('lblTextoIdCadConf');
+    const inputCodigo = document.getElementById('inputCodigoIdCadConf');
+    const btnConfirmar = document.getElementById('btnConfirmarIdCadConf');
+    const btnCancelar = document.getElementById('btnCancelarIdCadConf');
 
-    // 2. Montagem da URL
-    const url = `${urlSheets}?action=salvarNovoUsuario&nome=${encodeURIComponent(nome)}&documento=${encodeURIComponent(doc)}&email=${encodeURIComponent(email)}&transp=${encodeURIComponent(transp)}&senha=${encodeURIComponent(senha)}`;
+    if (modalId && lblTexto && inputCodigo && btnConfirmar && btnCancelar) {
+        // Injeta a descrição contextualizada com o nome selecionado da transportadora e a UF ativa
+        lblTexto.textContent = 'Digite o ID de Cadastro para o Operador "' + transp + '" (' + UF_SELECIONADA_CONF + '):';
+        inputCodigo.value = '';
+        modalId.style.display = 'flex';
 
-    try {
-        // Tentamos ler a resposta real
-        const resJson = await fetchJSONP(url);
+        btnCancelar.onclick = function() {
+            modalId.style.display = 'none';
+        };
 
-        if (resJson.success) {
-            if(typeof tocarBeep === 'function') tocarBeep('sucesso');
-            alert("✅ Cadastro realizado com sucesso!");
-            location.reload();
-        } else {
-            // Se o Google barrou (duplicidade), ele cai aqui e mostra o erro real
-            if(typeof tocarBeep === 'function') tocarBeep('erro');
-            alert("❌ Erro: " + resJson.error);
-            processandoCadastro = false;
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        }
-    } catch (err) {
-        // --- SOLUÇÃO PARA O SEU ERRO ---
-        // Se houver erro de comunicação mas o e-mail for ÚNICO, 
-        // o Google já salvou. Então apenas avisamos e resetamos.
-        console.log("Comunicação interrompida após gravação.");
-        
-        if(typeof tocarBeep === 'function') tocarBeep('sucesso');
-        alert("✅ Cadastro processado com sucesso!");
-        location.reload(); 
+        btnConfirmar.onclick = async function() {
+            const chaveDigitada = inputCodigo.value.trim().toUpperCase();
+            if (!chaveDigitada) {
+                alert("Por favor, digite o ID de Cadastro.");
+                return;
+            }
+
+            modalId.style.display = 'none';
+
+            // Ativa o estado visual de processamento nativo do seu formulário
+            processandoCadastro = true;
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner"></div> Gravando Registro...';
+
+            // 🎯 INJEÇÃO CIRÚRGICA: Repassa a chave 'idCad' na URL de rede para validação no banco de dados mestre
+            const url = `${urlSheets}?action=salvarNovoUsuario&nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&transp=${encodeURIComponent(transp)}&senha=${encodeURIComponent(senha)}&uf=${encodeURIComponent(UF_SELECIONADA_CONF)}&idCad=${encodeURIComponent(chaveDigitada)}`;
+
+            try {
+                const resJson = await fetchJSONP(url);
+
+                if (resJson.success) {
+                    if(typeof tocarBeep === 'function') tocarBeep('sucesso');
+                    alert("✅ Cadastro realizado com sucesso!");
+                    location.reload();
+                } else {
+                    // 🎯 BARREIRA DE SEGURANÇA: Se a chave mestre estiver errada na planilha, o servidor retorna falso aqui
+                    if(typeof tocarBeep === 'function') tocarBeep('erro');
+                    alert("❌ Erro: " + resJson.error);
+                    processandoCadastro = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (err) {
+                console.log("Comunicação interrompida após gravação.");
+                if(typeof tocarBeep === 'function') tocarBeep('sucesso');
+                alert("✅ Cadastro processado com sucesso!");
+                location.reload(); 
+            }
+        };
     }
-
 }
+
+
 
     
 // Função auxiliar para resetar o botão em caso de falha
@@ -3422,56 +3475,65 @@ function executarSairComRefresh() {
   }
 }
 
+    
 window.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('modalUfConf');
   const select = document.getElementById('selecaoUfConf');
   const btn = document.getElementById('btnConfirmarUfConf');
-  const comboTransp = document.getElementById('login-transp'); // 🎯 Captura o combo da sua tela de login
+  const comboLogin = document.getElementById('login-transp');
+  const comboCadastro = document.getElementById('reg-transp-list'); // 🎯 CAPTURA O COMBO DE CADASTRO DA IMAGEM
 
-  // Força o modal a iniciar visível bloqueando interações ao fundo
   if (modal) modal.style.display = 'flex';
 
-  if (btn && select && modal && comboTransp) {
+  if (btn && select && modal && comboLogin) {
     btn.addEventListener('click', function() {
       if (select.value === "") {
         alert("Por favor, selecione uma UF válida para continuar.");
         return;
       }
       
-      // 1. Salva a seleção na nova variável global do conferente
       UF_SELECIONADA_CONF = select.value;
-      
-      // 2. Oculta o modal liberando a tela de login original por baixo
       modal.style.display = 'none';
-      console.log("Região de conferência em doca definida:", UF_SELECIONADA_CONF);
       
-      // 3. Coloca o combo em estado de carregamento assíncrono
-      comboTransp.innerHTML = '<option value="" disabled selected>Carregando transportadoras de ' + UF_SELECIONADA_CONF + '...</option>';
+      // Coloca AMBOS os comboboxes em estado de carregamento síncrono
+      comboLogin.innerHTML = '<option value="" disabled selected>Carregando transportadoras de ' + UF_SELECIONADA_CONF + '...</option>';
+      if (comboCadastro) {
+        comboCadastro.innerHTML = '<option value="" disabled selected>Carregando transportadoras de ' + UF_SELECIONADA_CONF + '...</option>';
+      }
       
-      // 4. Cria o Callback Global que receberá a resposta da rota paralela do Apps Script
+      // Callback global que preenche as duas telas ao mesmo tempo
       window.cbCarregarTranspConf = function(listaTransp) {
-        // Reseta o cabeçalho padrão da caixa de seleção
-        comboTransp.innerHTML = '<option value="" disabled selected>Selecione a Transportadora...</option>';
+        comboLogin.innerHTML = '<option value="" disabled selected>Selecione a Transportadora...</option>';
+        if (comboCadastro) {
+          comboCadastro.innerHTML = '<option value="" disabled selected>Selecione a Transportadora...</option>';
+        }
         
         if (!listaTransp || listaTransp.length === 0) {
-          comboTransp.innerHTML = '<option value="" disabled>Nenhuma transportadora ativa para esta UF</option>';
+          const msgVazio = '<option value="" disabled>Nenhuma transportadora ativa para esta UF</option>';
+          comboLogin.innerHTML = msgVazio;
+          if (comboCadastro) comboCadastro.innerHTML = msgVazio;
           return;
         }
         
-        // Injeta cirurgicamente cada transportadora filtrada que veio do servidor
         listaTransp.forEach(function(transp) {
-          const option = document.createElement('option');
-          option.value = transp;
-          option.textContent = transp;
-          comboTransp.appendChild(option);
+          // Injeta na tela de Login
+          const optionLogin = document.createElement('option');
+          optionLogin.value = transp;
+          optionLogin.textContent = transp;
+          comboLogin.appendChild(optionLogin);
+
+          // 🎯 INJETA CIRURGICAMENTE NA TELA DE CADASTRO
+          if (comboCadastro) {
+            const optionCad = document.createElement('option');
+            optionCad.value = transp;
+            optionCad.textContent = transp;
+            comboCadastro.appendChild(optionCad);
+          }
         });
         
-        // Remove o ouvinte da memória global por segurança
         delete window.cbCarregarTranspConf;
       };
       
-      // 5. Dispara a chamada de rede utilizando o mecanismo nativo do seu projeto (GET/JSONP)
-      // Mapeia usando a constante 'urlSheets' padrão do seu Front-CONF
       if (typeof fetchJSONP === "function") {
         fetchJSONP(urlSheets + '?action=getTransportadorasList&uf=' + UF_SELECIONADA_CONF + '&callback=cbCarregarTranspConf');
       } else if (typeof callServer === "function") {
@@ -3480,6 +3542,7 @@ window.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
 
 
 
