@@ -364,11 +364,68 @@
     </div>
 </div>
 
+<!-- HTML DO MODAL DE ESTADO (Inserir logo após a abertura da tag <body>) -->
+<div id="modalUfConf" class="modal-overlay" style="display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: rgba(0, 0, 0, 0.65);">
+  <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    
+    <!-- Identidade Visual do Painel de Conferência -->
+    <div style="margin-bottom: 20px;">
+      <div style="width: 70px; height: 70px; background: #8A05BE; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="white">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 11.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+      </div>
+      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga</h2>
+      <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Selecione o estado de operação em doca</p>
+    </div>
+
+    <!-- Campo de Seleção Clean -->
+    <div style="text-align: left; margin-bottom: 25px;">
+      <label style="color: #8A05BE; font-weight: bold; font-size: 13px; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Estado (UF):</label>
+      <select id="selecaoUfConf" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: white; cursor: pointer; outline: none;">
+        <option value="" disabled selected>Selecione a Região</option>
+        <option value="AC">Acre (AC)</option>
+        <option value="AL">Alagoas (AL)</option>
+        <option value="AP">Amapá (AP)</option>
+        <option value="AM">Amazonas (AM)</option>
+        <option value="BA">Bahia (BA)</option>
+        <option value="CE">Ceará (CE)</option>
+        <option value="DF">Distrito Federal (DF)</option>
+        <option value="ES">Espírito Santo (ES)</option>
+        <option value="GO">Goiás (GO)</option>
+        <option value="MA">Maranhão (MA)</option>
+        <option value="MT">Mato Grosso (MT)</option>
+        <option value="MS">Mato Grosso do Sul (MS)</option>
+        <option value="MG">Minas Gerais (MG)</option>
+        <option value="PA">Pará (PA)</option>
+        <option value="PB">Paraíba (PB)</option>
+        <option value="PR">Paraná (PR)</option>
+        <option value="PE">Pernambuco (PE)</option>
+        <option value="PI">Piauí (PI)</option>
+        <option value="RJ">Rio de Janeiro (RJ)</option>
+        <option value="RN">Rio Grande do Norte (RN)</option>
+        <option value="RS">Rio Grande do Sul (RS)</option>
+        <option value="RO">Rondônia (RO)</option>
+        <option value="RR">Roraima (RR)</option>
+        <option value="SC">Santa Catarina (SC)</option>
+        <option value="SP">São Paulo (SP)</option>
+        <option value="SE">Sergipe (SE)</option>
+        <option value="TO">Tocantins (TO)</option>
+      </select>
+    </div>
+
+    <!-- Botão de Confirmação Roxo Estilo Padrão -->
+    <button id="btnConfirmarUfConf" style="width: 100%; padding: 14px; background: #8A05BE; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#7004A2'" onmouseout="this.style.background='#8A05BE'">
+      Confirmar Região
+    </button>
+
+  </div>
+</div>
 
 
 <!-- 1. TELA DE LOGIN -->
 <div id="screen-login" class="card"> <!-- Adicionado a classe card aqui -->
-    <h3>Passagem de Carga | Conferência v1</h3>
+    <h3>Passagem de Carga | Conferência v2</h3>
     <label>E-mail</label>
     <input type="email" id="login-user" placeholder="seu@email.com">
     
@@ -573,6 +630,7 @@ let temFaltasMarcadas = false;
 let romaneioSeguroBackup = "";
 // --- NOVA VARIÁVEL DE CONTROLE DE ENCADEAMENTO DE BIPAGEM ---
 let proximoCodigoObrigatorioPDC = null;
+let UF_SELECIONADA_CONF = ""; // Guarda o estado escolhido globalmente no Front-CONF
 
 window.aparelhoUtilizadoNoLote = sessionStorage.getItem("dispositivoSessao") || (window.innerWidth > 768 ? "via USB" : "via Mobile");
 
@@ -3363,6 +3421,37 @@ function executarSairComRefresh() {
     window.location.reload();
   }
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('modalUfConf');
+  const select = document.getElementById('selecaoUfConf');
+  const btn = document.getElementById('btnConfirmarUfConf');
+
+  // Força o modal a iniciar visível bloqueando interações ao fundo
+  if (modal) modal.style.display = 'flex';
+
+  if (btn && select && modal) {
+    btn.addEventListener('click', function() {
+      if (select.value === "") {
+        alert("Por favor, selecione uma UF válida para continuar.");
+        return;
+      }
+      
+      // Salva a seleção na nova variável global do conferente
+      UF_SELECIONADA_CONF = select.value;
+      
+      // Oculta o modal liberando a tela de login original por baixo
+      modal.style.display = 'none';
+      console.log("Região de conferência em doca definida:", UF_SELECIONADA_CONF);
+      
+      // 🚀 PRÓXIMO PASSO LOGICO: Aqui dispararemos o carregamento dinâmico do combo de transportadoras de login filtrado
+    });
+  }
+});
+
+
+
+    
     
 </script>
 
